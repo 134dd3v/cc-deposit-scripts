@@ -9,25 +9,25 @@ import { config } from "dotenv";
 
 config();
 
-const usdc_optimism = "0x7F5c764cBc14f9669B88837ca1490cCa17c31607";
+const usdc_ethmain = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const usdc_arbitrum = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
 const batching_manager_arbitrum = "0x519eb01fa6ed3d72e96e40770a45b13531cef63d";
-const opmain = new ethers.providers.AlchemyProvider(
-  "optimism",
+const ethmain = new ethers.providers.AlchemyProvider(
+  "mainnet",
   process.env.ALCHEMY
 );
 
-const signer = new ethers.Wallet(process.env.PRIVATE_KEY ?? "", opmain);
+const signer = new ethers.Wallet(process.env.PRIVATE_KEY ?? "", ethmain);
 const usdcAmount = ethers.utils.parseUnits("10", 6);
 
 crosschainDeposit(signer, usdcAmount).catch(console.error);
 
-// optimism to arbitrum deposit
+// ethereum to arbitrum deposit
 async function crosschainDeposit(signer: ethers.Signer, usdcAmount: BigNumber) {
   const signerChainId = await signer.getChainId();
-  if (signerChainId !== ChainId.OPT) {
+  if (signerChainId !== ChainId.ETH) {
     throw new Error(
-      "signer chain id is not optimism, please switch network to optimism"
+      "signer chain id is not ethereum, please switch network to ethereum"
     );
   }
 
@@ -43,8 +43,8 @@ async function crosschainDeposit(signer: ethers.Signer, usdcAmount: BigNumber) {
 
   // quote
   const quoteRequest: ContractCallQuoteRequest = {
-    fromChain: ChainId.OPT,
-    fromToken: usdc_optimism,
+    fromChain: ChainId.ETH,
+    fromToken: usdc_ethmain,
     fromAddress: await signer.getAddress(),
     toChain: ChainId.ARB,
     toToken: usdc_arbitrum,
